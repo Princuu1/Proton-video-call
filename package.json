@@ -1,0 +1,17 @@
+{ 
+  "name": "proton-video-call",
+  "version": "1.0.0",
+  "description": "A simple webrtc video call app",
+  "main": "server.js",
+  "engines": {
+      "node": "18.x"
+  },
+  "scripts": {
+      "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "socket.io": "^4.7.5",
+    "uuid": "^10.0.0"
+  }
+}

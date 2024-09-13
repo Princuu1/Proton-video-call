@@ -1,0 +1,174 @@
+/* Importing the sci-fi font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+body {
+    background: url('https://img.freepik.com/premium-photo/winter-mountains-lake-sunny-day-3d-illustration-generative-ai_170984-4784.jpg') no-repeat center center fixed;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+   margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#container {
+    width: 90%;
+    max-width: 1200px;
+    background: transparent;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 3em;
+    color: #ffffff;
+    font-style: italic;
+    text-align: center;
+    border: 2px solid #00ffcc; /* Futuristic neon border color */
+    padding: 15px; /* More padding for a better appearance */
+    background: linear-gradient(135deg, #2c3e50, #3498db); /* Gradient background */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 255, 255, 0.5); /* Neon glow effect */
+    font-family: 'Orbitron', sans-serif; /* Sci-fi font (needs to be imported) */
+}
+
+#userControls {
+    margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input[type="text"] {
+    padding: 10px;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 10px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+    border-color: #0056b3;
+    outline: none;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    margin: 5px;
+    font-size: 1em;
+}
+
+button:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+}
+
+button.red {
+    background: #dc3545;
+}
+
+button.red:hover {
+    background: #c82333;
+}
+
+button.green {
+    background: #28a745;
+}
+
+button.green:hover {
+    background: #218838;
+}
+
+#videos {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+video {
+    width: 100%;
+    max-width: 100%;
+    border: 2px solid #007bff;
+    border-radius: 15px;
+    background: #000;
+}
+
+#controls {
+    margin-bottom: 20px;
+}
+
+#footer {
+    margin-top: 20px;
+    font-size: 1em;
+    color: #ffffff;
+    font-style: italic;
+    text-align: center;
+    border: 2px solid #00ffcc; /* Futuristic neon border color */
+    padding: 15px; /* More padding for a better appearance */
+    background: linear-gradient(135deg, #2c3e50, #3498db); /* Gradient background */
+    border-radius: 12px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 255, 255, 0.5); /* Neon glow effect */
+    font-family: 'Orbitron', sans-serif; /* Sci-fi font (needs to be imported) */
+}
+
+
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+    #videos {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    video {
+        max-width: 100%;
+        height: auto;
+    }
+
+    button {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    #userControls {
+        width: 100%;
+    }
+
+    input[type="text"] {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5em;
+    }
+
+    button {
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+
+    #container {
+        padding: 10px;
+    }
+}
