@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Proton Video Call </title>
+    <title>Video Call App</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
     <div class="sidebar" id="sidebar">
@@ -27,7 +28,7 @@
                     </button>
                 </div>
                 <div class="button-group">
-                    <button class="btn" id="joinRoom"><i class="fas fa-sign-in-alt"></i> Join</button>
+                    <button class="btn primary" id="joinRoom"><i class="fas fa-sign-in-alt"></i> Join</button>
                     <button class="btn primary" id="createRoom"><i class="fas fa-plus-circle"></i> Create</button>
                 </div>
             </div>
@@ -35,7 +36,7 @@
     </div>
 
     <div class="main-content" id="mainContent">
-        <button id="menuToggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+        <button id="menuToggle" class="icon-btn"><i class="fas fa-cog"></i></button>
         
         <div class="video-container">
             <div class="video-wrapper">
@@ -51,19 +52,19 @@
         <div class="controls">
             <button class="btn control-btn" id="toggleMic">
                 <i class="fas fa-microphone"></i>
-                <span>Mute</span>
+                <span></span>
             </button>
             <button class="btn control-btn" id="toggleVideo">
                 <i class="fas fa-video"></i>
-                <span>Video</span>
+                <span></span>
             </button>
             <button class="btn control-btn red" id="endCall">
-                <i class="fas fa-phone-slash"></i>
-                <span>End Call</span>
+                <i class="fa-solid fa-phone-slash"></i>
+                <span> </span>
             </button>
             <button class="btn control-btn" id="fullscreen">
                 <i class="fas fa-expand"></i>
-                <span>Fullscreen</span>
+                <span></span>
             </button>
         </div>
     </div>
