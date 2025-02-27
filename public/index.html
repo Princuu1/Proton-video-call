@@ -1,38 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Proton Video Call</title>
+    <title>Proton Video Call </title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div id="container">
-        <h1> Proton Video Call</h1>
-        <div id="userControls">
-            <input type="text" id="displayName" placeholder="Enter Display Name" />
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-cog"></i> Settings</h2>
+            <button id="closeSidebar" class="icon-btn"><i class="fas fa-times"></i></button>
         </div>
-        <div id="controls">
-            <button id="createRoom">Create Room</button>
-            <button id="joinRoom">Join Room</button>
-        </div>
-        <div id="joinRoomControls" style="display: none;">
-            <input type="text" id="roomId" placeholder="Enter Room ID" />
-            <button id="submitJoinRoom">Submit</button>
-        </div>
-        <div id="callControls" style="display: none;">
-            <button id="endCall" class="red">End Call</button>
-            <button id="toggleCamera">Change Camera</button>
-            <button id="mute">Mute</button>
-            <button id="muteVideo">Mute Video</button>
-            <button id="fullscreen">Full Screen</button>
-        </div>
-        <div id="videos">
-            <video id="localVideo" autoplay muted></video>
-            <video id="remoteVideo" autoplay></video>
-        </div>
-        <div id="footer">
-            <p id="displayNameOnVideo">Created:- by Purvansh with ❤️</p>
+        
+        <div class="settings-content">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Display Name</label>
+                <input type="text" id="displayName" placeholder="Your name">
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-door-open"></i> Room ID</label>
+                <div class="room-id-group">
+                    <input type="text" id="roomId" placeholder="Room ID">
+                    <button class="icon-btn copy-btn" id="copyRoomId" title="Copy Room ID">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div class="button-group">
+                    <button class="btn" id="joinRoom"><i class="fas fa-sign-in-alt"></i> Join</button>
+                    <button class="btn primary" id="createRoom"><i class="fas fa-plus-circle"></i> Create</button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <div class="main-content" id="mainContent">
+        <button id="menuToggle" class="icon-btn"><i class="fas fa-bars"></i></button>
+        
+        <div class="video-container">
+            <div class="video-wrapper">
+                <video id="localVideo" autoplay muted></video>
+                <div class="video-label">You</div>
+            </div>
+            <div class="video-wrapper">
+                <video id="remoteVideo" autoplay></video>
+                <div class="video-label" id="remoteName"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn control-btn" id="toggleMic">
+                <i class="fas fa-microphone"></i>
+                <span>Mute</span>
+            </button>
+            <button class="btn control-btn" id="toggleVideo">
+                <i class="fas fa-video"></i>
+                <span>Video</span>
+            </button>
+            <button class="btn control-btn red" id="endCall">
+                <i class="fas fa-phone-slash"></i>
+                <span>End Call</span>
+            </button>
+            <button class="btn control-btn" id="fullscreen">
+                <i class="fas fa-expand"></i>
+                <span>Fullscreen</span>
+            </button>
+        </div>
+    </div>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
