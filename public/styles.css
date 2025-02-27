@@ -146,7 +146,11 @@ video {
     gap: 8px;
     transition: all 0.3s;
 }
-
+.btn:hover {
+    background-color: none; /* Darker shade on hover */
+    transform: scale(1.05); /* Slight scaling effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Soft shadow effect */
+}
 .btn.primary {
     background: var(--primary-color);
     color: white;
@@ -167,7 +171,311 @@ video {
 
 #menuToggle {
     position: fixed;
-    left: 20px;
-    top: 20px;
+    font-size: 1rem;
+    left: 0px;
+    top: 0px;
+    background: none;
+    border-radius: 50%;
     z-index: 100;
+}
+/* Add these media queries at the bottom of your existing CSS */
+
+@media (max-width: 768px) {
+    .video-container {
+        grid-template-columns: 1fr;
+        height: calc(100vh - 120px);
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .video-wrapper {
+        position: relative;
+        height: auto;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #000;
+    }
+
+    /* Local video (your camera) as small thumbnail */
+    .video-wrapper:first-child {
+        position: fixed;
+        bottom: 80px;
+        right: 10px;
+        width: 120px;
+        height: 160px;
+        z-index: 100;
+        border: 2px solid white;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    /* Remote video (full screen) */
+    .video-wrapper:last-child {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .video-label {
+        font-size: 0.8em;
+        padding: 3px 8px;
+    }
+
+    .controls {
+        position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    background: transparent;
+    padding: 10px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        z-index: 200;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+
+    .icon-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;   
+    }
+
+    /* Hide sidebar by default on mobile */
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.closed {
+        transform: translateX(-100%);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    #menuToggle {
+        left: 10px;
+        top: 10px;
+    }
+}
+
+
+/* Mobile First Approach */
+@media (max-width: 768px) {
+    /* Enhanced Mobile Menu Toggle */
+    #menuToggle {
+        position: fixed;
+        left: 15px;
+        top: 15px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    /* Mobile-Optimized Sidebar */
+    .sidebar {
+        width: 100%;
+        padding: 15px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+        z-index: 999;
+    }
+
+    .sidebar-header {
+        margin-bottom: 20px;
+        padding: 10px;
+    }
+
+    /* Enhanced Mobile Buttons */
+    .btn {
+        padding: 14px;
+    border-radius: 50%; /* Makes the button circular */
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers content */
+    gap: 2px; /* Reduces space between elements */
+    width: 50px; /* Ensures circular shape */
+    height: 50px;
+    text-align: center; /* Centers text */
+}
+
+    .button-group {
+        margin: 10px 0;
+        gap: 5px; /* Adjust this value as needed */
+    }
+    .btn.primary {
+        background: var(--primary-color);
+        color: white;
+        border-radius: 25px; /* Ensures it stays rectangular */
+        padding: 10px 20px; /* Keeps a button shape */
+        display: inline-block; /* Avoids unexpected flex issues */
+        width: auto; /* Prevents forced square/circle */
+        height: auto;
+    }
+    
+    /* Video Call Controls */
+    .controls {
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        justify-content: space-between;
+        padding: 8px 15px;
+        border-radius: 30px;
+    }
+
+    .control {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    .control.danger {
+        order: 1; /* Make end call button central */
+        transform: scale(1.2);
+    }
+
+    /* Enhanced Form Elements */
+    input {
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    /* Mobile Video Layout */
+    .video-container {
+        grid-template-columns: 1fr;
+        height: 100vh;
+        padding: 0;
+    }
+
+    .video-wrapper:first-child { /* Local video */
+        width: 25vw;
+        height: 33vw;
+        bottom: 80px;
+        right: 10px;
+        border-radius: 8px;
+    }
+
+    .video-wrapper:last-child { /* Remote video */
+        background: #000;
+    }
+
+    /* Enhanced Close Button */
+    #closeSidebar {
+        padding: 10px;
+        font-size: 1.5rem;
+    }
+}
+
+/* Smaller Screens Optimization */
+@media (max-width: 480px) {
+    .controls {
+        width: 95%;
+        padding: 8px 10px;
+    }
+
+    .control {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        justify-content: center;
+    }
+    
+
+    .video-wrapper:first-child {
+        width: 30vw;
+        height: 40vw;
+        bottom: 70px;
+    }
+
+    .btn {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+
+    #menuToggle {
+        right: 10px; /* Move to the right */
+        left: auto; /* Remove the left positioning */
+        top: 10px; /* Keep it at the top */
+        z-index: 100;
+    }
+    
+}
+
+/* Animation Enhancements */
+.sidebar {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:active {
+    transform: scale(0.95);
+    opacity: 0.9;
+}
+
+/* Better Touch Targets */
+button {
+    touch-action: manipulation;
+}
+/* Desktop */
+.sidebar {
+    transform: translateX(0);
+}
+
+.main-content {
+    margin-left: var(--sidebar-width);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .main-content.menu-active {
+        margin-left: 0;
+        pointer-events: none;
+    }
+}
+.disconnected {
+    color: red;
+    font-weight: bold;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
 }
