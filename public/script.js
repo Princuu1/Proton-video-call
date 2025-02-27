@@ -157,7 +157,7 @@ elements.toggleMic.addEventListener('click', () => {
     localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
     elements.toggleMic.innerHTML = `
         <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
-        <span>${isMuted ? 'Unmute' : 'Mute'}</span>
+        <span>${isMuted ? '' : ''}</span>
     `;
 });
 
@@ -166,23 +166,76 @@ elements.toggleVideo.addEventListener('click', () => {
     localStream.getVideoTracks().forEach(track => track.enabled = !isVideoMuted);
     elements.toggleVideo.innerHTML = `
         <i class="fas fa-video${isVideoMuted ? '-slash' : ''}"></i>
-        <span>${isVideoMuted ? 'Show' : 'Hide'}</span>
+        <span>${isVideoMuted ? '' : ''}</span>
     `;
 });
 
 elements.endCall.addEventListener('click', () => {
+    if (!currentRoomId) return; // Prevents running if no call was active
+
     peerConnection?.close();
     localStream?.getTracks().forEach(track => track.stop());
     socket.emit('leave-room', currentRoomId);
     elements.remoteVideo.srcObject = null;
-    elements.remoteName.textContent = 'Disconnected';
+
+    // Show "Disconnected" only after a call has ended
+    elements.remoteName.innerHTML = `Disconnected`;
+    elements.remoteName.classList.add('disconnected'); // Add pulse effect
+
     currentRoomId = null;
+});
+
+// Reset text when a call starts
+socket.on('user-connected', (userId) => {
+    elements.remoteName.textContent = userId; // Set to connected user’s name
+    elements.remoteName.classList.remove('disconnected'); // Remove animation
 });
 
 elements.fullscreen.addEventListener('click', () => {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
+        elements.fullscreen.innerHTML = `<i class="fas fa-compress"></i>`; // Change to compress icon
     } else {
         document.exitFullscreen();
+        elements.fullscreen.innerHTML = `<i class="fas fa-expand"></i>`; // Change back to expand icon
+    }
+});
+
+// Toggle sidebar with enhanced mobile handling
+elements.menuToggle.addEventListener('click', () => {
+    elements.sidebar.classList.toggle('active');
+    elements.mainContent.classList.toggle('menu-active');
+});
+
+// Close sidebar with close button
+elements.closeSidebar.addEventListener('click', () => {
+    elements.sidebar.classList.remove('active');
+    elements.mainContent.classList.remove('menu-active');
+});
+
+// Close sidebar when clicking outside (mobile)
+document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768) {
+        if (!elements.sidebar.contains(e.target) && 
+            !elements.menuToggle.contains(e.target)) {
+            elements.sidebar.classList.remove('active');
+            elements.mainContent.classList.remove('menu-active');
+        }
+    }
+});
+
+// Swipe to close (mobile only)
+let touchStartX = 0;
+document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+});
+
+document.addEventListener('touchend', e => {
+    if (window.innerWidth <= 768) {
+        const touchEndX = e.changedTouches[0].screenX;
+        if (touchStartX - touchEndX > 50) { // Swipe left
+            elements.sidebar.classList.remove('active');
+            elements.mainContent.classList.remove('menu-active');
+        }
     }
 });
