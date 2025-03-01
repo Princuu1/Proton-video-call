@@ -1,7 +1,7 @@
 const socket = io();
 let localStream;
 let peerConnection;
-const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+let configuration;
 
 const elements = {
     sidebar: document.getElementById('sidebar'),
@@ -31,13 +31,12 @@ elements.menuToggle.addEventListener('click', () => {
     elements.sidebar.classList.toggle('closed');
     elements.mainContent.classList.toggle('expanded');
 });
-
 elements.closeSidebar.addEventListener('click', () => {
     elements.sidebar.classList.add('closed');
     elements.mainContent.classList.add('expanded');
 });
 
-// Copy Room ID
+// Copy Room ID to clipboard
 elements.copyRoomId.addEventListener('click', () => {
     if (currentRoomId) {
         navigator.clipboard.writeText(currentRoomId);
@@ -50,10 +49,14 @@ elements.createRoom.addEventListener('click', async () => {
     const displayName = elements.displayName.value.trim();
     if (!displayName) return alert('Please enter display name');
     
-    socket.emit('create-room', { displayName }, (roomId) => {
-        currentRoomId = roomId;
-        elements.roomId.value = roomId;
-        startCall();
+    socket.emit('create-room', { displayName }, async (roomId) => {
+        if (roomId) {
+            currentRoomId = roomId;
+            elements.roomId.value = roomId;
+            await startCall();
+        } else {
+            alert('Error creating room.');
+        }
     });
 });
 
@@ -62,23 +65,43 @@ elements.joinRoom.addEventListener('click', () => {
     const displayName = elements.displayName.value.trim();
     if (!roomId || !displayName) return alert('Please fill all fields');
 
-    socket.emit('join-room', { roomId, displayName }, (success) => {
+    socket.emit('join-room', { roomId, displayName }, async (success) => {
         if (success) {
             currentRoomId = roomId;
-            startCall();
+            await startCall();
         } else {
             alert('Room not found');
         }
     });
 });
 
+// Fetch TURN credentials from backend
+async function getTurnCredentials() {
+    try {
+        const response = await fetch('/getTurnCredentials');
+        const config = await response.json();
+        return config;
+    } catch (error) {
+        console.error('Failed to fetch TURN credentials:', error);
+        // Fallback configuration (only a STUN server)
+        return {
+            iceServers: [
+                { urls: ["stun:stun.l.google.com:19302"] }
+            ]
+        };
+    }
+}
+
 async function startCall() {
     try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         elements.localVideo.srcObject = localStream;
+        // Get TURN configuration from the server
+        configuration = await getTurnCredentials();
         setupPeerConnection();
     } catch (error) {
         console.error('Error accessing media devices:', error);
+        alert('Could not access camera or microphone.');
     }
 }
 
@@ -102,6 +125,7 @@ function setupPeerConnection() {
         }
     };
 
+    // Create an offer if initiating the call
     peerConnection.createOffer()
         .then(offer => peerConnection.setLocalDescription(offer))
         .then(() => {
@@ -110,14 +134,26 @@ function setupPeerConnection() {
                 to: currentRoomId,
                 displayName: elements.displayName.value
             });
+        })
+        .catch(error => {
+            console.error('Error creating offer:', error);
         });
 }
 
-// WebRTC Handlers
+// WebRTC Signaling Handlers
 socket.on('offer', async (data) => {
     elements.remoteName.textContent = data.displayName;
     
+    // If configuration is not set, fetch it
+    if (!configuration) {
+        configuration = await getTurnCredentials();
+    }
+
     peerConnection = new RTCPeerConnection(configuration);
+    localStream.getTracks().forEach(track => 
+        peerConnection.addTrack(track, localStream)
+    );
+
     peerConnection.ontrack = event => {
         elements.remoteVideo.srcObject = event.streams[0];
     };
@@ -148,92 +184,86 @@ socket.on('answer', async (data) => {
 });
 
 socket.on('candidate', async (data) => {
-    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+    try {
+        await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+    } catch (error) {
+        console.error('Error adding received ICE candidate', error);
+    }
 });
 
-// Control Handlers
+// Media Control Handlers
 elements.toggleMic.addEventListener('click', () => {
     isMuted = !isMuted;
     localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
-    elements.toggleMic.innerHTML = `
-        <i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>
-        <span>${isMuted ? '' : ''}</span>
-    `;
+    elements.toggleMic.innerHTML = `<i class="fas fa-microphone${isMuted ? '-slash' : ''}"></i>`;
 });
 
 elements.toggleVideo.addEventListener('click', () => {
     isVideoMuted = !isVideoMuted;
     localStream.getVideoTracks().forEach(track => track.enabled = !isVideoMuted);
-    elements.toggleVideo.innerHTML = `
-        <i class="fas fa-video${isVideoMuted ? '-slash' : ''}"></i>
-        <span>${isVideoMuted ? '' : ''}</span>
-    `;
+    elements.toggleVideo.innerHTML = `<i class="fas fa-video${isVideoMuted ? '-slash' : ''}"></i>`;
 });
 
 elements.endCall.addEventListener('click', () => {
-    if (!currentRoomId) return; // Prevents running if no call was active
+    if (!currentRoomId) return; // Prevent if no active call
 
     peerConnection?.close();
     localStream?.getTracks().forEach(track => track.stop());
     socket.emit('leave-room', currentRoomId);
     elements.remoteVideo.srcObject = null;
 
-    // Show "Disconnected" only after a call has ended
-    elements.remoteName.innerHTML = `Disconnected`;
-    elements.remoteName.classList.add('disconnected'); // Add pulse effect
+    elements.remoteName.textContent = `Disconnected`;
+    elements.remoteName.classList.add('disconnected');
 
     currentRoomId = null;
 });
 
-// Reset text when a call starts
+// When a user connects
 socket.on('user-connected', (userId) => {
-    elements.remoteName.textContent = userId; // Set to connected user’s name
-    elements.remoteName.classList.remove('disconnected'); // Remove animation
+    elements.remoteName.textContent = userId;
+    elements.remoteName.classList.remove('disconnected');
 });
 
+// Fullscreen Toggle
 elements.fullscreen.addEventListener('click', () => {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
-        elements.fullscreen.innerHTML = `<i class="fas fa-compress"></i>`; // Change to compress icon
+        elements.fullscreen.innerHTML = `<i class="fas fa-compress"></i>`;
     } else {
         document.exitFullscreen();
-        elements.fullscreen.innerHTML = `<i class="fas fa-expand"></i>`; // Change back to expand icon
+        elements.fullscreen.innerHTML = `<i class="fas fa-expand"></i>`;
     }
 });
 
-// Toggle sidebar with enhanced mobile handling
+// Enhanced Mobile Sidebar Toggle
 elements.menuToggle.addEventListener('click', () => {
     elements.sidebar.classList.toggle('active');
     elements.mainContent.classList.toggle('menu-active');
 });
 
-// Close sidebar with close button
 elements.closeSidebar.addEventListener('click', () => {
     elements.sidebar.classList.remove('active');
     elements.mainContent.classList.remove('menu-active');
 });
 
-// Close sidebar when clicking outside (mobile)
 document.addEventListener('click', (e) => {
     if (window.innerWidth <= 768) {
-        if (!elements.sidebar.contains(e.target) && 
-            !elements.menuToggle.contains(e.target)) {
+        if (!elements.sidebar.contains(e.target) && !elements.menuToggle.contains(e.target)) {
             elements.sidebar.classList.remove('active');
             elements.mainContent.classList.remove('menu-active');
         }
     }
 });
 
-// Swipe to close (mobile only)
+// Swipe to close sidebar on mobile
 let touchStartX = 0;
 document.addEventListener('touchstart', e => {
     touchStartX = e.changedTouches[0].screenX;
 });
-
 document.addEventListener('touchend', e => {
     if (window.innerWidth <= 768) {
         const touchEndX = e.changedTouches[0].screenX;
-        if (touchStartX - touchEndX > 50) { // Swipe left
+        if (touchStartX - touchEndX > 50) { // Swipe left to close
             elements.sidebar.classList.remove('active');
             elements.mainContent.classList.remove('menu-active');
         }
