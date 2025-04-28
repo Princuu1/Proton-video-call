@@ -122,6 +122,15 @@ video {
     border-radius: 5px;
     font-size: 0.9em;
 }
+/* Mirroring local video */
+#localVideo {
+    transform: scaleX(-1); /* Local video is mirrored */
+}
+
+/* Remote video (not mirrored) */
+#remoteVideo {
+    transform: scaleX(-1); /* Remote video is not mirrored */
+}
 
 .controls {
     position: fixed;
